@@ -1,0 +1,56 @@
+version: '3.8'
+
+services:
+  db:
+    image: postgres:15
+    container_name: ac-crm-db
+    environment:
+      POSTGRES_DB: accrm_db
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: ac123456789
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - ac-crm-network
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+      target: development
+    container_name: ac-crm-backend
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ASPNETCORE_URLS=http://+:5000
+      - ConnectionStrings__DefaultConnection=Host=db;Port=5432;Database=accrm_db;Username=admin;Password=ac123456789
+    ports:
+      - "5000:5000"
+    depends_on:
+      - db
+    networks:
+      - ac-crm-network
+    restart: unless-stopped
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: ac-crm-frontend
+    environment:
+      - REACT_APP_API_URL=http://localhost:5000/api
+    ports:
+      - "3000:3000"
+    depends_on:
+      - backend
+    networks:
+      - ac-crm-network
+    restart: unless-stopped
+
+volumes:
+  postgres_data:
+
+networks:
+  ac-crm-network:
+    driver: bridge 
