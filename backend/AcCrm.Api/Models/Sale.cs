@@ -10,29 +10,33 @@ public class Sale
     [Required]
     public Guid CustomerId { get; set; }
     
-    [Required]
-    public Guid ProductId { get; set; }
-    
     public DateTime SaleDate { get; set; } = DateTime.UtcNow;
     
     [Required]
     [Column(TypeName = "decimal(18,2)")]
     public decimal TotalAmountGBP { get; set; }
     
-    public RecurrenceType? RecurrenceType { get; set; }
+    [Column(TypeName = "decimal(18,2)")]
+    public decimal TotalRecurringAmountGBP { get; set; } = 0;
     
-    public int? RecurrenceInterval { get; set; }
+    // Auto-calculated from payments
+    [Column(TypeName = "decimal(18,2)")]
+    public decimal TotalPaidGBP { get; set; } = 0;
     
-    public DateTime? NextDueDate { get; set; }
+    // Outstanding balance
+    public decimal OutstandingBalanceGBP => TotalAmountGBP - TotalPaidGBP;
     
     public SaleStatus Status { get; set; } = SaleStatus.Active;
     
     public Guid? QuoteId { get; set; }
     
+    [StringLength(1000)]
+    public string? Notes { get; set; }
+    
     // Navigation Properties
     public virtual Customer Customer { get; set; } = null!;
-    public virtual Product Product { get; set; } = null!;
     public virtual Quote? Quote { get; set; }
+    public virtual ICollection<SaleItem> SaleItems { get; set; } = new List<SaleItem>();
     public virtual ICollection<Payment> Payments { get; set; } = new List<Payment>();
     public virtual ICollection<Invoice> Invoices { get; set; } = new List<Invoice>();
 } 

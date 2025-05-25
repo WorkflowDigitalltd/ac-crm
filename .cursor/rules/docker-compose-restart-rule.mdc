@@ -1,0 +1,45 @@
+---
+description: 
+globs: 
+alwaysApply: true
+---
+Docker Compose Restart Rule
+Instruction:
+
+Whenever a container needs to be restarted to apply changes (such as code updates, environment changes, or to resolve issues), always use:
+
+pgsql
+Copy
+Edit
+docker-compose restart <service-name>
+where <service-name> is either frontend or backend (or another specific service).
+
+Rules:
+
+Do NOT use docker-compose down or docker-compose up to restart services except when absolutely necessary (e.g. you need to rebuild the image, update dependencies, or change the service definition).
+
+ONLY use docker-compose build and then docker-compose up -d <service-name> if you have made changes to the Dockerfile or the dependencies, or if specifically instructed to do so.
+
+For routine code changes, config tweaks, or general service restarts, always use docker-compose restart <service-name>.
+
+Avoid using docker-compose up without -d to prevent accidental interactive/foreground runs unless specifically troubleshooting.
+
+Summary:
+
+Default: docker-compose restart <service-name>
+
+Only rebuild: If Dockerfile/dependencies change, then docker-compose build <service-name> followed by docker-compose up -d <service-name>
+
+Never use: docker-compose down or docker-compose up for normal restarts.
+
+Example Scenarios:
+
+Scenario	Correct Command(s)
+Code/config updated	docker-compose restart backend
+Dockerfile changed	docker-compose build backend
+docker-compose up -d backend
+Add new dependency	docker-compose build backend
+docker-compose up -d backend
+Quick restart after crash	docker-compose restart backend
+
+Full rebuild required	Only if specifically needed, not by default

@@ -4,7 +4,11 @@ import CustomerList from './components/CustomerList';
 import CustomerForm from './components/CustomerForm';
 import ProductList from './components/ProductList';
 import ProductForm from './components/ProductForm';
-import { Customer, Product } from './store/useStore';
+import SalesList from './components/SalesList';
+import SaleForm from './components/SaleForm';
+import PaymentForm from './components/PaymentForm';
+import ExpensesPage from './pages/ExpensesPage';
+import { Customer, Product, Sale } from './store/useStore';
 
 function App() {
   const [currentPage, setCurrentPage] = useState('dashboard');
@@ -16,6 +20,15 @@ function App() {
   // Product modal state
   const [isProductFormOpen, setIsProductFormOpen] = useState(false);
   const [editingProduct, setEditingProduct] = useState<Product | undefined>(undefined);
+
+  // Sale modal state
+  const [isSaleFormOpen, setIsSaleFormOpen] = useState(false);
+  const [editingSale, setEditingSale] = useState<Sale | undefined>(undefined);
+  const [preselectedCustomerId, setPreselectedCustomerId] = useState<string | undefined>(undefined);
+
+  // Payment modal state
+  const [isPaymentFormOpen, setIsPaymentFormOpen] = useState(false);
+  const [paymentSale, setPaymentSale] = useState<Sale | undefined>(undefined);
 
   const handleCustomerAdd = () => {
     setEditingCustomer(undefined);
@@ -45,6 +58,39 @@ function App() {
   const handleProductFormClose = () => {
     setIsProductFormOpen(false);
     setEditingProduct(undefined);
+  };
+
+  const handleSaleAdd = () => {
+    setEditingSale(undefined);
+    setPreselectedCustomerId(undefined);
+    setIsSaleFormOpen(true);
+  };
+
+  const handleSaleEdit = (sale: Sale) => {
+    setEditingSale(sale);
+    setPreselectedCustomerId(undefined);
+    setIsSaleFormOpen(true);
+  };
+
+  const handleSaleView = (sale: Sale) => {
+    // For now, just edit the sale
+    handleSaleEdit(sale);
+  };
+
+  const handleSaleFormClose = () => {
+    setIsSaleFormOpen(false);
+    setEditingSale(undefined);
+    setPreselectedCustomerId(undefined);
+  };
+
+  const handleAddPayment = (sale: Sale) => {
+    setPaymentSale(sale);
+    setIsPaymentFormOpen(true);
+  };
+
+  const handlePaymentFormClose = () => {
+    setIsPaymentFormOpen(false);
+    setPaymentSale(undefined);
   };
 
   const renderPage = () => {
@@ -80,6 +126,18 @@ function App() {
                       >
                         Manage Products
                       </button>
+                      <button
+                        className="btn btn-outline-info"
+                        onClick={() => setCurrentPage('sales')}
+                      >
+                        Manage Sales
+                      </button>
+                      <button
+                        className="btn btn-outline-secondary"
+                        onClick={() => setCurrentPage('expenses')}
+                      >
+                        Manage Expenses
+                      </button>
                     </div>
                   </div>
                 </div>
@@ -88,9 +146,9 @@ function App() {
               <div className="col-md-4">
                 <div className="card h-100">
                   <div className="card-body">
-                    <h3 className="card-title h5">Phase 1 Complete</h3>
+                    <h3 className="card-title h5">Phase 2 Complete</h3>
                     <p className="card-text text-muted mb-3">
-                      Your CRM foundation is ready!
+                      Sales & Payments now available!
                     </p>
                     <div className="small">
                       <div className="d-flex align-items-center mb-1 text-success">
@@ -101,9 +159,13 @@ function App() {
                         <span className="status-dot success"></span>
                         Product Management
                       </div>
+                      <div className="d-flex align-items-center mb-1 text-success">
+                        <span className="status-dot success"></span>
+                        Sales & Orders
+                      </div>
                       <div className="d-flex align-items-center text-success">
                         <span className="status-dot success"></span>
-                        UK Formatting (£, DD/MM/YYYY)
+                        Payment Tracking
                       </div>
                     </div>
                   </div>
@@ -113,22 +175,22 @@ function App() {
               <div className="col-md-4">
                 <div className="card h-100">
                   <div className="card-body">
-                    <h3 className="card-title h5">Coming Soon</h3>
+                    <h3 className="card-title h5">Phase 3 Progress</h3>
                     <p className="card-text text-muted mb-3">
-                      Phase 2 features in development
+                      Phase 3 features in development
                     </p>
                     <div className="small">
                       <div className="d-flex align-items-center mb-1 text-warning">
                         <span className="status-dot warning"></span>
-                        Sales & Orders
+                        Invoices & Quotes
                       </div>
-                      <div className="d-flex align-items-center mb-1 text-warning">
-                        <span className="status-dot warning"></span>
-                        Payment Tracking
+                      <div className="d-flex align-items-center mb-1 text-success">
+                        <span className="status-dot success"></span>
+                        Expense Tracking
                       </div>
                       <div className="d-flex align-items-center text-warning">
                         <span className="status-dot warning"></span>
-                        Invoices & Quotes
+                        Advanced Reports
                       </div>
                     </div>
                   </div>
@@ -151,6 +213,18 @@ function App() {
                     <h6 className="fw-medium mb-2">📦 Product Catalog</h6>
                     <p className="text-muted small mb-0">
                       Manage your products and services with flexible pricing and recurring billing options.
+                    </p>
+                  </div>
+                  <div className="col-md-6 mb-3">
+                    <h6 className="fw-medium mb-2">🛒 Shopping Basket Sales</h6>
+                    <p className="text-muted small mb-0">
+                      Create sales with multiple products and flexible pricing, supporting complex orders.
+                    </p>
+                  </div>
+                  <div className="col-md-6 mb-3">
+                    <h6 className="fw-medium mb-2">💰 Partial Payments</h6>
+                    <p className="text-muted small mb-0">
+                      Track deposits, installments, and flexible payment schedules with automatic balance calculation.
                     </p>
                   </div>
                   <div className="col-md-6 mb-3">
@@ -203,19 +277,29 @@ function App() {
       
       case 'sales':
         return (
-          <div className="card">
-            <div className="card-body text-center py-5">
-              <div className="mb-4">
-                <svg className="text-muted" width="96" height="96" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                </svg>
-              </div>
-              <h3 className="h5 mb-3">Sales & Orders</h3>
-              <p className="text-muted mb-3">This feature will be available in Phase 2.</p>
-              <p className="small text-muted">Complete your customer and product setup first, then we'll add powerful sales tracking capabilities.</p>
-            </div>
-          </div>
+          <>
+            <SalesList 
+              onAdd={handleSaleAdd}
+              onEdit={handleSaleEdit}
+              onView={handleSaleView}
+              onAddPayment={handleAddPayment}
+            />
+            <SaleForm
+              sale={editingSale}
+              isOpen={isSaleFormOpen}
+              onClose={handleSaleFormClose}
+              preselectedCustomerId={preselectedCustomerId}
+            />
+            <PaymentForm
+              sale={paymentSale}
+              isOpen={isPaymentFormOpen}
+              onClose={handlePaymentFormClose}
+            />
+          </>
         );
+      
+      case 'expenses':
+        return <ExpensesPage />;
       
       default:
         return (

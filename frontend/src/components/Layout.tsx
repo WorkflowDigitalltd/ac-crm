@@ -3,7 +3,8 @@ import {
   UsersIcon, 
   CubeIcon, 
   ChartBarIcon,
-  HomeIcon 
+  HomeIcon,
+  BanknotesIcon
 } from '@heroicons/react/24/outline';
 
 interface LayoutProps {
@@ -17,7 +18,8 @@ const Layout: React.FC<LayoutProps> = ({ children, currentPage, onPageChange }) 
     { name: 'Dashboard', href: 'dashboard', icon: HomeIcon },
     { name: 'Customers', href: 'customers', icon: UsersIcon },
     { name: 'Products', href: 'products', icon: CubeIcon },
-    { name: 'Sales', href: 'sales', icon: ChartBarIcon, disabled: true },
+    { name: 'Sales', href: 'sales', icon: ChartBarIcon },
+    { name: 'Expenses', href: 'expenses', icon: BanknotesIcon },
   ];
 
   return (
@@ -26,7 +28,7 @@ const Layout: React.FC<LayoutProps> = ({ children, currentPage, onPageChange }) 
       <nav className="navbar">
         <div className="container-fluid">
           <div className="d-flex justify-content-between align-items-center w-100">
-            <a href="#" className="navbar-brand">
+            <a href="#" className="navbar-brand" style={{ color: 'red', fontWeight: 'bold', fontSize: '24px' }}>
               AC CRM
             </a>
             
@@ -36,20 +38,16 @@ const Layout: React.FC<LayoutProps> = ({ children, currentPage, onPageChange }) 
                   key={item.name}
                   onClick={(e) => {
                     e.preventDefault();
-                    if (!item.disabled) onPageChange(item.href);
+                    onPageChange(item.href);
                   }}
                   className={`
                     nav-link
                     ${currentPage === item.href ? 'active' : ''}
-                    ${item.disabled ? 'disabled' : ''}
                   `}
-                  style={{ cursor: item.disabled ? 'not-allowed' : 'pointer' }}
+                  style={{ cursor: 'pointer' }}
                 >
                   <item.icon style={{ width: '20px', height: '20px', marginRight: '8px' }} />
                   {item.name}
-                  {item.disabled && (
-                    <span className="phase-2-badge">Phase 2</span>
-                  )}
                 </a>
               ))}
             </div>
