@@ -217,7 +217,7 @@ const SalesList: React.FC<SalesListProps> = ({ onAdd, onEdit, onView, onAddPayme
                     <th>Outstanding</th>
                     <th>Status</th>
                     <th>Payment Status</th>
-                    <th>Actions</th>
+                    <th style={{ minWidth: '250px' }}>Actions</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -266,42 +266,66 @@ const SalesList: React.FC<SalesListProps> = ({ onAdd, onEdit, onView, onAddPayme
                             {getPaymentStatusText(sale.totalAmountGBP || 0, sale.totalPaidGBP || 0, sale.outstandingBalanceGBP || 0)}
                           </span>
                         </td>
-                        <td>
-                          <div className="d-flex gap-1">
+                        <td style={{ minWidth: '250px' }}>
+                          <div className="d-flex gap-2 flex-nowrap">
                             <button
-                              className="btn btn-sm btn-outline-primary"
+                              className="btn"
                               onClick={() => onView(sale)}
+                              style={{ 
+                                color: '#3b82f6', 
+                                padding: '0.25rem',
+                                border: 'none',
+                                background: 'none'
+                              }}
                               title="View Details"
                             >
-                              <EyeIcon style={{ width: '16px', height: '16px' }} />
+                              <EyeIcon style={{ width: '18px', height: '18px' }} />
                             </button>
                             <button
-                              className="btn btn-sm btn-outline-secondary"
+                              className="btn"
                               onClick={() => onEdit(sale)}
+                              style={{ 
+                                color: '#6b7280', 
+                                padding: '0.25rem',
+                                border: 'none',
+                                background: 'none'
+                              }}
                               title="Edit Sale"
                             >
-                              <PencilIcon style={{ width: '16px', height: '16px' }} />
+                              <PencilIcon style={{ width: '18px', height: '18px' }} />
+                            </button>
+
+                            <button
+                              className="btn"
+                              onClick={() => {
+                                console.log('Delete button clicked for sale:', sale.id);
+                                handleDeleteSale(sale.id);
+                              }}
+                              style={{ 
+                                color: '#dc2626', 
+                                padding: '0.25rem',
+                                border: 'none',
+                                background: 'none'
+                              }}
+                              title="Delete Sale"
+                            >
+                              <TrashIcon style={{ width: '18px', height: '18px' }} />
                             </button>
                             {(sale.outstandingBalanceGBP || 0) > 0 && (
                               <button
-                                className="btn btn-sm btn-outline-success"
+                                className="btn"
                                 onClick={() => onAddPayment(sale)}
+                                style={{ 
+                                  color: '#059669', 
+                                  padding: '0.25rem',
+                                  border: 'none',
+                                  background: 'none'
+                                }}
                                 title="Add Payment"
                               >
-                                <CreditCardIcon style={{ width: '16px', height: '16px' }} />
+                                <CreditCardIcon style={{ width: '18px', height: '18px' }} />
                               </button>
                             )}
-                          </div>
-                        </td>
-                        <td>
-                          <div className="d-flex justify-content-center align-items-center">
-                            <button
-                              className="btn btn-sm btn-outline-danger"
-                              onClick={() => handleDeleteSale(sale.id)}
-                              title="Delete Sale"
-                            >
-                              <TrashIcon style={{ width: '16px', height: '16px' }} />
-                            </button>
                           </div>
                         </td>
                       </tr>

@@ -34,6 +34,7 @@ Due to Docker volume mount issues on Windows, we use a restart-first, rebuild-wh
 ### Available Scripts
 - `restart-all.bat` - **USE THIS FIRST** - Restart all services cleanly
 - `rebuild-frontend.bat` / `rebuild-frontend.ps1` - Rebuild frontend container only (when restart isn't enough)
+- `troubleshoot-docker.bat` - **NEW!** Interactive troubleshooting menu for Docker issues
 
 ### Workflow Summary
 1. Make your code changes
@@ -52,13 +53,80 @@ Due to Docker volume mount issues on Windows, we use a restart-first, rebuild-wh
 
 ---
 
+## Docker Troubleshooting
+
+### **Quick Fix: Run the Troubleshooting Script**
+```bash
+# Interactive troubleshooting menu
+./troubleshoot-docker.bat
+```
+
+### **Problem: Changes Not Showing Up**
+
+If you make code changes but they don't appear in the browser, follow this troubleshooting guide:
+
+#### **Step 1: Try Simple Restart First (90% of cases)**
+```bash
+# Restart specific service
+docker-compose restart frontend
+# OR restart all services
+./restart-all.bat
+```
+
+#### **Step 2: If Changes Still Don't Show - Docker Cache Issue**
+This is what we experienced - Docker was using cached layers and not picking up changes.
+
+**For Frontend Issues:**
+```bash
+# Complete frontend rebuild (no cache)
+docker-compose stop frontend
+docker-compose rm -f frontend
+docker-compose build --no-cache frontend
+docker-compose up -d frontend
+```
+
+**For Backend Issues:**
+```bash
+# Complete backend rebuild (no cache)
+docker-compose stop backend
+docker-compose rm -f backend
+docker-compose build --no-cache backend
+docker-compose up -d backend
+```
+
+**For All Services:**
+```bash
+# Nuclear option - rebuild everything
+docker-compose down
+docker-compose build --no-cache
+docker-compose up -d
+```
+
+#### **Step 3: Browser Cache Issues**
+- Try hard refresh: `Ctrl + F5` (Windows) or `Cmd + Shift + R` (Mac)
+- Open browser developer tools and disable cache
+- Try incognito/private browsing mode
+
+#### **When to Use Each Approach**
+| Issue | Solution | When to Use |
+|-------|----------|-------------|
+| Code changes not showing | `docker-compose restart <service>` | **Always try first** |
+| Still not working | Rebuild with `--no-cache` | When restart doesn't work |
+| Browser shows old version | Hard refresh `Ctrl+F5` | After container changes |
+| Nothing works | Nuclear rebuild all | Last resort |
+
+### **Key Lesson: Docker Build Cache**
+- Docker aggressively caches build layers for speed
+- Sometimes it doesn't detect code changes as requiring a rebuild
+- The `--no-cache` flag forces Docker to rebuild everything from scratch
+- This is why our delete button wasn't showing until we used `--no-cache`
+
 ## UK Settings
 - Dates: DD-MM-YYYY
 - Currency: £
 - Spelling: UK English
 
-
-Docker Compose Restart Rule
+## Docker Compose Restart Rule
 Instruction:
 
 Whenever a container needs to be restarted to apply changes (such as code updates, environment changes, or to resolve issues), always use:

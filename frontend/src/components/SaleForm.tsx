@@ -261,8 +261,8 @@ const SaleForm: React.FC<SaleFormProps> = ({ sale, isOpen, onClose, preselectedC
         if (collectPayment && paymentAmount > 0) {
           const paymentTypeText = paymentType === 'full' ? 'Full Payment' : 'Deposit';
           try {
-            // Add a small delay to ensure sale is fully committed to database
-            await new Promise(resolve => setTimeout(resolve, 100));
+            // Add a delay to ensure sale is fully committed to database
+            await new Promise(resolve => setTimeout(resolve, 500));
             
             console.log('Creating payment for sale:', newSale.id, 'Amount:', paymentAmount);
             await paymentApi.create({
